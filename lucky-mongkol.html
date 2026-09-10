@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lucky Mongkol — วันดีและเลขมงคลรายวัน</title>
+<meta name="theme-color" content="#131A2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lucky Mongkol">
+<meta name="application-name" content="Lucky Mongkol">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#131A2E;
+    --ink-2:#1B2440;
+    --ink-3:#26314F;
+    --gold:#D9A94B;
+    --gold-dim:#8C6E30;
+    --shad:#B8422F;
+    --jade:#6BA98F;
+    --paper:#EFE7D6;
+    --muted:#9096AC;
+    --line:rgba(239,231,214,.14);
+    --sun:#D8323C; --mon:#E8C33A; --tue:#E86AA0; --wed:#3FA86B;
+    --thu:#E8813A; --fri:#4A9BD8; --sat:#8A6BC4;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:"IBM Plex Sans Thai","Noto Sans Thai",-apple-system,sans-serif;
+    font-size:15px;line-height:1.65;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+  h1,h2,h3,.serif{font-family:"Noto Serif Thai","Noto Serif",serif;font-weight:600;letter-spacing:.01em}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px}
+
+  /* ---- masthead ---- */
+  header{padding:22px 0 14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand h1{margin:0;font-size:26px;line-height:1.1}
+  .brand span{font-size:12.5px;color:var(--muted)}
+  .era{margin:8px 0 0;font-size:12.5px;color:var(--muted)}
+
+  /* ---- seal ---- */
+  .seal-row{display:flex;gap:18px;align-items:center;margin-bottom:22px}
+  .seal{
+    flex:0 0 auto;width:118px;height:118px;border-radius:50%;
+    display:grid;place-items:center;text-align:center;position:relative;
+    border:2px solid var(--gold);box-shadow:inset 0 0 0 5px rgba(217,169,75,.16);
+  }
+  .seal.bad{border-color:var(--shad);box-shadow:inset 0 0 0 5px rgba(184,66,47,.18)}
+  .seal.mid{border-color:var(--gold-dim);box-shadow:inset 0 0 0 5px rgba(140,110,48,.14)}
+  .seal-num{font-family:"Noto Serif Thai",serif;font-size:40px;line-height:1;color:var(--gold)}
+  .seal.bad .seal-num{color:var(--shad)}
+  .seal.mid .seal-num{color:var(--paper)}
+  .seal-tag{font-size:11.5px;margin-top:4px;color:var(--paper);opacity:.85}
+  @media (prefers-reduced-motion:no-preference){
+    .stamp{animation:stamp .5s cubic-bezier(.2,1.4,.4,1) both}
+    @keyframes stamp{from{transform:scale(1.35) rotate(-7deg);opacity:0}to{transform:none;opacity:1}}
+  }
+  .today-name{font-size:24px;margin:0 0 2px}
+  .today-sub{font-size:13.5px;color:var(--muted);margin:0}
+  .today-planet{font-size:13.5px;margin:6px 0 0}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+
+  /* ---- score bar ---- */
+  .score{margin:0 0 24px}
+  .score-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:7px}
+  .score-top b{font-family:"Noto Serif Thai",serif;font-size:17px;font-weight:600}
+  .track{height:6px;background:var(--ink-3);border-radius:3px;overflow:hidden}
+  .fill{height:100%;border-radius:3px;transition:width .5s ease}
+
+  /* ---- data rows ---- */
+  .row{display:flex;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+  .row-k{flex:0 0 92px;font-size:13px;color:var(--muted);padding-top:2px}
+  .row-v{flex:1;min-width:0;font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:13px;
+    background:var(--ink-2);display:inline-flex;align-items:center;gap:6px
+  }
+  .chip b{font-family:"Noto Serif Thai",serif;color:var(--gold);font-size:15px;font-weight:600}
+  .chip.warn b{color:var(--shad)}
+  .chip small{color:var(--muted);font-size:11px}
+  .swatch{display:inline-block;width:15px;height:15px;border-radius:3px;border:1px solid rgba(255,255,255,.25);vertical-align:-2px;margin-right:6px}
+  .yes{color:var(--jade)} .no{color:var(--shad)}
+  .note{font-size:12.5px;color:var(--muted);margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+
+  /* ---- tabs ---- */
+  nav{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;
+    background:rgba(19,26,46,.94);backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);
+    padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+    display:flex;justify-content:space-around
+  }
+  nav button{
+    background:none;border:0;color:var(--muted);font:inherit;font-size:12px;
+    padding:6px 12px;border-radius:8px;cursor:pointer;display:grid;gap:3px;justify-items:center
+  }
+  nav button i{font-family:"Noto Serif Thai",serif;font-style:normal;font-size:18px;line-height:1}
+  nav button[aria-current="true"]{color:var(--gold)}
+  .page{display:none}
+  .page.on{display:block}
+
+  /* ---- calendar ---- */
+  .yearbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .yearbar button{
+    background:var(--ink-2);border:1px solid var(--line);color:var(--paper);
+    font:inherit;width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:17px
+  }
+  .yearbar b{font-family:"Noto Serif Thai",serif;font-size:20px;font-weight:600;flex:1;text-align:center}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-bottom:20px}
+  .mon{margin-bottom:26px}
+  .mon h3{margin:0 0 10px;font-size:16px;display:flex;align-items:baseline;gap:8px}
+  .mon h3 small{font-weight:400;font-family:"IBM Plex Sans Thai",sans-serif;color:var(--muted);font-size:11.5px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .hd{font-size:11px;color:var(--muted);text-align:center;padding-bottom:3px}
+  .cell{
+    aspect-ratio:1/1;border:0;background:var(--ink-2);color:var(--paper);
+    border-radius:7px;font:inherit;font-size:13px;cursor:pointer;
+    display:grid;place-items:center;position:relative;padding:0
+  }
+  .cell.pad{background:none;cursor:default}
+  .cell.g1{background:rgba(217,169,75,.24);color:#F5E4BE}
+  .cell.g2{background:rgba(107,169,143,.20);color:#D6EEE3}
+  .cell.b1{background:rgba(184,66,47,.24);color:#F2CFC7}
+  .cell.mix{background:linear-gradient(135deg,rgba(217,169,75,.26) 50%,rgba(184,66,47,.26) 50%)}
+  .cell.now{box-shadow:0 0 0 1.5px var(--paper)}
+  .cell i{position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7}
+
+  /* ---- finder ---- */
+  .ctl{margin-bottom:18px}
+  .ctl p{margin:0 0 9px;font-size:13px;color:var(--muted)}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{
+    background:var(--ink-2);border:1px solid var(--line);color:var(--paper);
+    font:inherit;font-size:13.5px;padding:7px 13px;border-radius:999px;cursor:pointer
+  }
+  .opt[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:rgba(217,169,75,.10)}
+  .hit{display:flex;gap:14px;align-items:center;padding:13px 0;border-top:1px solid var(--line)}
+  .hit-d{flex:0 0 46px;text-align:center}
+  .hit-d b{font-family:"Noto Serif Thai",serif;font-size:21px;font-weight:600;display:block;line-height:1.1}
+  .hit-d small{font-size:11px;color:var(--muted)}
+  .hit-b{flex:1;min-width:0}
+  .hit-b strong{font-weight:500;font-size:14px}
+  .hit-b span{display:block;font-size:12.5px;color:var(--muted)}
+  .hit-s{font-family:"Noto Serif Thai",serif;font-size:16px;font-weight:600}
+
+  /* ---- number tool ---- */
+  input[type=text],input[type=date],select{
+    width:100%;background:var(--ink-2);border:1px solid var(--line);color:var(--paper);
+    font:inherit;font-size:16px;padding:11px 13px;border-radius:10px
+  }
+  input:focus-visible,select:focus-visible,button:focus-visible,.cell:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .big{font-family:"Noto Serif Thai",serif;font-size:46px;line-height:1;color:var(--gold);font-weight:600}
+  .calcline{font-size:13px;color:var(--muted);word-break:break-all}
+
+  /* ---- sheet ---- */
+  .scrim{position:fixed;inset:0;background:rgba(8,11,20,.6);z-index:30;display:none}
+  .scrim.on{display:block}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:31;max-height:85vh;overflow:auto;
+    background:var(--ink);border-top:2px solid var(--gold);border-radius:16px 16px 0 0;
+    padding:20px 18px calc(28px + env(safe-area-inset-bottom));transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1)
+  }
+  .sheet.on{transform:none}
+  .sheet-x{position:absolute;top:14px;right:14px;background:none;border:0;color:var(--muted);font:inherit;font-size:22px;cursor:pointer;line-height:1}
+  details{margin-top:14px}
+  summary{cursor:pointer;font-size:13px;color:var(--gold)}
+  details pre{
+    font-size:12px;line-height:1.8;color:var(--muted);white-space:pre-wrap;
+    background:var(--ink-2);padding:12px;border-radius:8px;margin:10px 0 0;
+    font-family:"IBM Plex Sans Thai",monospace
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><h1>Lucky Mongkol</h1><span>วันดี เลขดี รายวันทั้งปี</span></div>
+    <p class="era" id="era"></p>
+  </header>
+
+  <!-- ========== วันนี้ ========== -->
+  <section class="page on" id="p-today">
+    <div class="seal-row">
+      <div class="seal stamp" id="tSeal">
+        <div>
+          <div class="seal-num" id="tSealNum">๑</div>
+          <div class="seal-tag" id="tSealTag">ปกติ</div>
+        </div>
+      </div>
+      <div>
+        <h2 class="today-name" id="tName">—</h2>
+        <p class="today-sub" id="tDate">—</p>
+        <p class="today-planet" id="tPlanet">—</p>
+      </div>
+    </div>
+
+    <div class="score">
+      <div class="score-top"><span>คะแนนมงคลของวัน</span><b id="tScore">—</b></div>
+      <div class="track"><div class="fill" id="tFill" style="width:0"></div></div>
+    </div>
+
+    <div class="row"><div class="row-k">เลขมงคล</div><div class="row-v"><div class="chips" id="tNums"></div></div></div>
+    <div class="row"><div class="row-k">สีประจำวัน</div><div class="row-v" id="tColor"></div></div>
+    <div class="row"><div class="row-k">เหมาะกับ</div><div class="row-v yes" id="tGood"></div></div>
+    <div class="row"><div class="row-k">ควรเลี่ยง</div><div class="row-v no" id="tAvoid"></div></div>
+    <div class="row"><div class="row-k">กาลโยคปีนี้</div><div class="row-v" id="tKal"></div></div>
+
+    <details>
+      <summary>ที่มาของตัวเลขและวิธีคำนวณ</summary>
+      <pre id="tWork"></pre>
+    </details>
+    <p class="note">กาลโยคคำนวณจากปีจุลศักราช และเปลี่ยนปีในวันเถลิงศก (ประมาณ 16 เมษายน) แอปนี้ใช้ 16 เมษายนเป็นวันตัดปี ตัวเลขมงคลใช้ระบบเลขศาสตร์ดาวประจำวัน ส่วนกิจกรรมที่เหมาะและควรเลี่ยงมาจากความเชื่อที่นิยมใช้กันทั่วไป ตำราแต่ละสำนักอาจต่างกัน ควรเทียบกับปฏิทินหลวงก่อนใช้กับงานสำคัญจริง</p>
+  </section>
+
+  <!-- ========== ปฏิทิน ========== -->
+  <section class="page" id="p-year">
+    <div class="yearbar">
+      <button id="yPrev" aria-label="ปีก่อนหน้า">‹</button>
+      <b id="yLabel">—</b>
+      <button id="yNext" aria-label="ปีถัดไป">›</button>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:rgba(217,169,75,.7)"></span>ธงชัย</span>
+      <span><span class="dot" style="background:rgba(107,169,143,.8)"></span>อธิบดี</span>
+      <span><span class="dot" style="background:rgba(184,66,47,.8)"></span>อุบาทว์ / โลกาวินาศ</span>
+      <span><span class="dot" style="background:var(--ink-3)"></span>วันปกติ</span>
+    </div>
+    <div id="yBody"></div>
+  </section>
+
+  <!-- ========== หาวันดี ========== -->
+  <section class="page" id="p-find">
+    <div class="ctl">
+      <p>จะทำเรื่องอะไร</p>
+      <div class="opts" id="fAct"></div>
+    </div>
+    <div class="ctl">
+      <p>ภายในกี่วัน</p>
+      <div class="opts" id="fRange"></div>
+    </div>
+    <div id="fBody"></div>
+  </section>
+
+  <!-- ========== เลขมงคล ========== -->
+  <section class="page" id="p-num">
+    <div class="ctl">
+      <p>กรอกเบอร์โทร ทะเบียนรถ หรือบ้านเลขที่</p>
+      <input type="text" id="nIn" inputmode="numeric" placeholder="เช่น 081 234 5678" autocomplete="off">
+    </div>
+    <div class="ctl">
+      <p>วันเกิดของคุณ ใช้เทียบว่าเลขเข้ากับดวงไหม</p>
+      <select id="nDow">
+        <option value="">ยังไม่ระบุ</option>
+      </select>
+    </div>
+    <div id="nBody"></div>
+  </section>
+
+  <!-- ========== เสี่ยงโชค ========== -->
+  <section class="page" id="p-luck">
+    <div id="lBody"></div>
+  </section>
+</div>
+
+<nav>
+  <button data-go="today" aria-current="true"><i>๑</i>วันนี้</button>
+  <button data-go="year"><i>๑๒</i>ปฏิทิน</button>
+  <button data-go="find"><i>✦</i>หาวันดี</button>
+  <button data-go="num"><i>๙</i>เลขมงคล</button>
+  <button data-go="luck"><i>✧</i>เสี่ยงโชค</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="รายละเอียดวัน">
+  <button class="sheet-x" id="sheetX" aria-label="ปิด">×</button>
+  <div id="sheetBody"></div>
+</div>
+
+<script>
+/* ============================================================
+   Lucky Mongkol — ข้อมูลและตรรกะ
+   ============================================================ */
+
+const TH_NUM = '๐๑๒๓๔๕๖๗๘๙';
+const thNum = n => String(n).replace(/\d/g, d => TH_NUM[+d]);
+
+const DOW = [
+  { name:'อาทิตย์', planet:'อาทิตย์', num:1, color:'สีแดง',   hex:'var(--sun)', buddha:'ปางถวายเนตร' },
+  { name:'จันทร์',  planet:'จันทร์',  num:2, color:'สีเหลือง', hex:'var(--mon)', buddha:'ปางห้ามสมุทร' },
+  { name:'อังคาร',  planet:'อังคาร',  num:3, color:'สีชมพู',   hex:'var(--tue)', buddha:'ปางไสยาสน์' },
+  { name:'พุธ',     planet:'พุธ',     num:4, color:'สีเขียว',  hex:'var(--wed)', buddha:'ปางอุ้มบาตร' },
+  { name:'พฤหัสบดี',planet:'พฤหัสบดี',num:5, color:'สีแสด',    hex:'var(--thu)', buddha:'ปางสมาธิ' },
+  { name:'ศุกร์',   planet:'ศุกร์',   num:6, color:'สีฟ้า',    hex:'var(--fri)', buddha:'ปางรำพึง' },
+  { name:'เสาร์',   planet:'เสาร์',   num:7, color:'สีม่วง',   hex:'var(--sat)', buddha:'ปางนาคปรก' }
+];
+
+const MONTH = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+               'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+const NUM_MEAN = {
+  1:'ผู้นำ อำนาจ การเริ่มต้น',
+  2:'เสน่ห์ การเจรจา ความอ่อนโยน',
+  3:'พลัง ความกล้า การต่อสู้',
+  4:'การสื่อสาร การค้า ไหวพริบ',
+  5:'ความรู้ คุณธรรม ครูบาอาจารย์',
+  6:'ความรัก ศิลปะ ความงาม',
+  7:'ความอดทน งานหนัก บททดสอบ',
+  8:'พลิกผัน โชคก้อนใหญ่ ความเสี่ยง',
+  9:'ความสำเร็จ บารมี สิ่งศักดิ์สิทธิ์'
+};
+
+/* กิจกรรม: วันที่นิยมทำ และวันที่คนไทยมักเลี่ยง (0 = อาทิตย์) */
+const ACTS = [
+  { id:'wed',   label:'แต่งงาน',        good:[1,4,5], bad:[2,6] },
+  { id:'house', label:'ขึ้นบ้านใหม่',   good:[1,4,5], bad:[2,6] },
+  { id:'car',   label:'ออกรถ',          good:[3,4,5], bad:[2,6] },
+  { id:'biz',   label:'เปิดกิจการ',     good:[3,4,5], bad:[6] },
+  { id:'sign',  label:'เซ็นสัญญา',      good:[1,4],   bad:[2] },
+  { id:'trip',  label:'เดินทางไกล',     good:[0,4,5], bad:[6] },
+  { id:'hair',  label:'ตัดผม',          good:[2,4],   bad:[3] },
+  { id:'merit', label:'ทำบุญ สะเดาะเคราะห์', good:[4,6], bad:[] }
+];
+
+const RANGES = [30, 60, 90, 180];
+
+/* ---------- กาลโยค ----------
+   จุลศักราช (จ.ศ.) = พ.ศ. − 1181 นับจากวันเถลิงศก (ใช้ 16 เม.ย.)
+   ธงชัย      = (จ.ศ. × 3 + 3) mod 7
+   อธิบดี      = (จ.ศ. + 5)     mod 7
+   อุบาทว์     = (จ.ศ. × 3 + 2) mod 7
+   โลกาวินาศ  = (จ.ศ.)         mod 7
+   เศษ 1 = อาทิตย์ … เศษ 0 คือ 7 = เสาร์
+   ตรวจสอบแล้วกับ จ.ศ. 1387 และ 1388 ตรงกับปฏิทินโหร
+--------------------------------------------------------------*/
+function csOf(d){
+  const be = d.getFullYear() + 543;
+  const afterNewYear = (d.getMonth() > 3) || (d.getMonth() === 3 && d.getDate() >= 16);
+  return be - (afterNewYear ? 1181 : 1182);
+}
+const mod7 = n => { const r = ((n % 7) + 7) % 7; return r === 0 ? 7 : r; };
+
+function kalayokOf(cs){
+  const pick = n => mod7(n) - 1;                 // → index 0..6
+  return {
+    cs,
+    thongchai:  pick(cs * 3 + 3),
+    athibodi:   pick(cs + 5),
+    ubat:       pick(cs * 3 + 2),
+    lokawinat:  pick(cs)
+  };
+}
+
+function statusOf(d){
+  const k = kalayokOf(csOf(d));
+  const w = d.getDay();
+  const tags = [];
+  if (w === k.thongchai) tags.push({ key:'thongchai', name:'วันธงชัย', kind:'good', tone:'g1',
+    text:'วันมีชัย ทำการใดมักสำเร็จ เหมาะกับการเริ่มต้นและงานที่ผูกกับสถานที่หรือสิ่งของ' });
+  if (w === k.athibodi) tags.push({ key:'athibodi', name:'วันอธิบดี', kind:'good', tone:'g2',
+    text:'วันแห่งอำนาจและความมั่นคง เหมาะกับเรื่องของบุคคล การปกครอง และพิธีที่ต้องการบารมี' });
+  if (w === k.ubat) tags.push({ key:'ubat', name:'วันอุบาทว์', kind:'bad', tone:'b1',
+    text:'วันติดขัดสำหรับตัวบุคคล ค้าขายไม่ขึ้น ระวังอุบัติเหตุและเรื่องเคราะห์' });
+  if (w === k.lokawinat) tags.push({ key:'lokawinat', name:'วันโลกาวินาศ', kind:'bad', tone:'b1',
+    text:'วันวุ่นวายและสูญเสียสำหรับหมู่คณะ เลี่ยงงานใหญ่ที่ผูกกับสิ่งของและสถานที่' });
+  return { k, tags };
+}
+
+/* ---------- เลขมงคล ---------- */
+const reduce1 = n => { while (n > 9) n = String(n).split('').reduce((a,b)=>a+ +b, 0); return n; };
+const digitSum = s => (String(s).match(/\d/g) || []).reduce((a,b)=>a+ +b, 0);
+
+function numbersOf(d){
+  const dow = DOW[d.getDay()];
+  const be  = d.getFullYear() + 543;
+  const nawang = reduce1(d.getDate());
+  const total  = reduce1(digitSum(d.getDate()) + digitSum(d.getMonth()+1) + digitSum(be));
+  const blend  = reduce1(dow.num + nawang);
+  return [
+    { n: dow.num, why: 'ดาวประจำวัน' + dow.planet },
+    { n: nawang,  why: 'จากวันที่ ' + d.getDate() },
+    { n: blend,   why: 'ดาววัน + วันที่' },
+    { n: total,   why: 'ผลรวมวัน เดือน ปี' }
+  ];
+}
+
+/* ---------- คะแนน ---------- */
+function scoreOf(d, actId){
+  const { tags } = statusOf(d);
+  let s = 52, notes = [];
+  tags.forEach(t => {
+    if (t.key === 'thongchai') { s += 30; notes.push('เป็นวันธงชัย'); }
+    if (t.key === 'athibodi')  { s += 25; notes.push('เป็นวันอธิบดี'); }
+    if (t.key === 'ubat')      { s -= 30; notes.push('เป็นวันอุบาทว์'); }
+    if (t.key === 'lokawinat') { s -= 34; notes.push('เป็นวันโลกาวินาศ'); }
+  });
+  if (actId){
+    const a = ACTS.find(x => x.id === actId);
+    if (a.good.includes(d.getDay())) { s += 9;  notes.push('คนไทยนิยมทำ' + a.label + 'ในวันนี้'); }
+    if (a.bad.includes(d.getDay()))  { s -= 16; notes.push('มักเลี่ยง' + a.label + 'ในวันนี้'); }
+  }
+  const nums = numbersOf(d);
+  if (nums[2].n === DOW[d.getDay()].num) { s += 4; notes.push('เลขวันกับเลขดาวหนุนกัน'); }
+  s = Math.max(2, Math.min(100, Math.round(s)));
+  return { s, notes, tags };
+}
+
+const grade = s =>
+  s >= 82 ? { t:'ดีมาก',      c:'var(--gold)' } :
+  s >= 66 ? { t:'ดี',         c:'var(--jade)' } :
+  s >= 46 ? { t:'ปานกลาง',    c:'var(--paper)' } :
+  s >= 28 ? { t:'ควรระวัง',   c:'#D98A4B' } :
+            { t:'ควรเลี่ยง',  c:'var(--shad)' };
+
+const fmtDate = d => `${d.getDate()} ${MONTH[d.getMonth()]} ${d.getFullYear()+543}`;
+const actNames = w => {
+  const g = ACTS.filter(a => a.good.includes(w)).map(a => a.label);
+  const b = ACTS.filter(a => a.bad.includes(w)).map(a => a.label);
+  return { g, b };
+};
+
+/* ============================================================
+   วันนี้
+   ============================================================ */
+const today = new Date();
+today.setHours(12,0,0,0);
+
+function renderToday(){
+  const d = today, dow = DOW[d.getDay()];
+  const { s, tags, notes } = scoreOf(d);
+  const k = kalayokOf(csOf(d));
+
+  document.getElementById('era').textContent =
+    `จุลศักราช ${thNum(k.cs)} · ธงชัย ${DOW[k.thongchai].name} · อธิบดี ${DOW[k.athibodi].name} · อุบาทว์ ${DOW[k.ubat].name} · โลกาวินาศ ${DOW[k.lokawinat].name}`;
+
+  const seal = document.getElementById('tSeal');
+  const goodTag = tags.find(t => t.kind === 'good');
+  const badTag  = tags.find(t => t.kind === 'bad');
+  seal.className = 'seal stamp ' + (badTag && !goodTag ? 'bad' : goodTag ? '' : 'mid');
+  document.getElementById('tSealNum').textContent = thNum(d.getDate());
+  document.getElementById('tSealTag').textContent =
+    tags.length ? tags.map(t => t.name.replace('วัน','')).join(' + ') : 'วันปกติ';
+
+  document.getElementById('tName').textContent = 'วัน' + dow.name;
+  document.getElementById('tDate').textContent = fmtDate(d);
+  document.getElementById('tPlanet').innerHTML =
+    `<span class="dot" style="background:${dow.hex}"></span>ดาว${dow.planet} เลข ${dow.num} · พระประจำวัน ${dow.buddha}`;
+
+  const g = grade(s);
+  document.getElementById('tScore').innerHTML = `<span style="color:${g.c}">${s} ${g.t}</span>`;
+  const fill = document.getElementById('tFill');
+  fill.style.background = g.c; fill.style.width = s + '%';
+
+  document.getElementById('tNums').innerHTML = numbersOf(d)
+    .map(x => `<span class="chip"><b>${x.n}</b><small>${x.why}</small></span>`).join('');
+
+  document.getElementById('tColor').innerHTML =
+    `<span class="swatch" style="background:${dow.hex}"></span>${dow.color} หนุนดวงวัน${dow.name}`;
+
+  const a = actNames(d.getDay());
+  document.getElementById('tGood').textContent  = a.g.length ? a.g.join(' · ') : 'ไม่มีกิจกรรมที่เด่นเป็นพิเศษ';
+  document.getElementById('tAvoid').textContent = a.b.length ? a.b.join(' · ') : 'ไม่มีข้อห้ามตามความเชื่อวันนี้';
+
+  document.getElementById('tKal').innerHTML = tags.length
+    ? tags.map(t => `<div style="margin-bottom:6px"><b style="font-weight:500;color:${t.kind==='good'?'var(--gold)':'var(--shad)'}">${t.name}</b> ${t.text}</div>`).join('')
+    : 'วันนี้ไม่ตรงกับวารกาลโยคใดในปีนี้ ถือเป็นวันกลาง ๆ ใช้ได้ตามปกติ';
+
+  document.getElementById('tWork').textContent =
+`พ.ศ. ${d.getFullYear()+543} → จุลศักราช ${k.cs}
+   (พ.ศ. − 1181 นับจากวันเถลิงศก 16 เมษายน)
+
+ธงชัย     (${k.cs} × 3 + 3) หาร 7 เศษ ${mod7(k.cs*3+3)} = วัน${DOW[k.thongchai].name}
+อธิบดี     (${k.cs} + 5) หาร 7 เศษ ${mod7(k.cs+5)} = วัน${DOW[k.athibodi].name}
+อุบาทว์    (${k.cs} × 3 + 2) หาร 7 เศษ ${mod7(k.cs*3+2)} = วัน${DOW[k.ubat].name}
+โลกาวินาศ ${k.cs} หาร 7 เศษ ${mod7(k.cs)} = วัน${DOW[k.lokawinat].name}
+
+คะแนน ${s} เต็ม 100
+เริ่มที่ 52 แล้วปรับตาม: ${notes.length ? notes.join(', ') : 'ไม่มีปัจจัยเพิ่มหรือลด'}`;
+}
+
+/* ============================================================
+   ปฏิทินทั้งปี
+   ============================================================ */
+let year = today.getFullYear();
+
+function toneOf(d){
+  const { tags } = statusOf(d);
+  const good = tags.some(t => t.kind === 'good');
+  const bad  = tags.some(t => t.kind === 'bad');
+  if (good && bad) return 'mix';
+  if (bad) return 'b1';
+  if (tags.some(t => t.key === 'thongchai')) return 'g1';
+  if (good) return 'g2';
+  return '';
+}
+
+function renderYear(){
+  document.getElementById('yLabel').textContent = 'พ.ศ. ' + (year + 543);
+  const out = [];
+  for (let m = 0; m < 12; m++){
+    const first = new Date(year, m, 1);
+    const days  = new Date(year, m+1, 0).getDate();
+    const k     = kalayokOf(csOf(new Date(year, m, 15)));
+    let cells = '';
+    for (let i = 0; i < first.getDay(); i++) cells += '<div class="cell pad"></div>';
+    for (let dd = 1; dd <= days; dd++){
+      const d = new Date(year, m, dd); d.setHours(12,0,0,0);
+      const isNow = d.toDateString() === today.toDateString();
+      cells += `<button class="cell ${toneOf(d)}${isNow?' now':''}" data-d="${year}-${m}-${dd}">${dd}</button>`;
+    }
+    out.push(`<div class="mon"><h3>${MONTH[m]} <small>ธงชัย ${DOW[k.thongchai].name} · อธิบดี ${DOW[k.athibodi].name}</small></h3>
+      <div class="grid">${['อา','จ','อ','พ','พฤ','ศ','ส'].map(x=>`<div class="hd">${x}</div>`).join('')}${cells}</div></div>`);
+  }
+  document.getElementById('yBody').innerHTML = out.join('');
+}
+
+document.getElementById('yPrev').onclick = () => { year--; renderYear(); };
+document.getElementById('yNext').onclick = () => { year++; renderYear(); };
+
+/* ============================================================
+   หาวันดี
+   ============================================================ */
+let fAct = 'wed', fRange = 60;
+
+function renderFindCtl(){
+  document.getElementById('fAct').innerHTML = ACTS
+    .map(a => `<button class="opt" data-a="${a.id}" aria-pressed="${a.id===fAct}">${a.label}</button>`).join('');
+  document.getElementById('fRange').innerHTML = RANGES
+    .map(r => `<button class="opt" data-r="${r}" aria-pressed="${r===fRange}">${r} วัน</button>`).join('');
+}
+
+function renderFind(){
+  const rows = [];
+  for (let i = 0; i < fRange; i++){
+    const d = new Date(today); d.setDate(d.getDate() + i); d.setHours(12,0,0,0);
+    const r = scoreOf(d, fAct);
+    if (r.s >= 66) rows.push({ d, ...r });
+  }
+  rows.sort((a,b) => b.s - a.s || a.d - b.d);
+  const top = rows.slice(0, 20);
+  const body = document.getElementById('fBody');
+  if (!top.length){
+    body.innerHTML = `<p class="note" style="border:0;padding-top:4px">ช่วง ${fRange} วันนี้ไม่มีวันที่เข้าเกณฑ์ดี ลองขยายช่วงเวลาให้ยาวขึ้น</p>`;
+    return;
+  }
+  body.innerHTML =
+    `<p class="note" style="border:0;padding:0;margin:0 0 4px">พบ ${top.length} วันที่เข้าเกณฑ์ เรียงจากคะแนนสูงสุด</p>` +
+    top.map(r => {
+      const g = grade(r.s), dow = DOW[r.d.getDay()];
+      return `<button class="hit" data-d="${r.d.getFullYear()}-${r.d.getMonth()}-${r.d.getDate()}"
+                style="background:none;border:0;border-top:1px solid var(--line);width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer">
+        <span class="hit-d"><b>${r.d.getDate()}</b><small>${MONTH[r.d.getMonth()].slice(0,3)}</small></span>
+        <span class="hit-b"><strong>วัน${dow.name}</strong><span>${r.notes.join(' · ') || 'วันกลาง ๆ ไม่มีข้อห้าม'}</span></span>
+        <span class="hit-s" style="color:${g.c}">${r.s}</span>
+      </button>`;
+    }).join('');
+}
+
+document.getElementById('fAct').onclick = e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  fAct = b.dataset.a; renderFindCtl(); renderFind();
+};
+document.getElementById('fRange').onclick = e => {
+  const b = e.target.closest('[data-r]'); if (!b) return;
+  fRange = +b.dataset.r; renderFindCtl(); renderFind();
+};
+
+/* ============================================================
+   เลขมงคล
+   ============================================================ */
+const nDow = document.getElementById('nDow');
+DOW.forEach((x,i) => nDow.insertAdjacentHTML('beforeend', `<option value="${i}">วัน${x.name}</option>`));
+
+try { const saved = localStorage.getItem('poom.dow'); if (saved) nDow.value = saved; } catch(e){}
+
+function renderNum(){
+  const raw = document.getElementById('nIn').value;
+  const digits = (raw.match(/\d/g) || []);
+  const body = document.getElementById('nBody');
+  const w = nDow.value === '' ? null : +nDow.value;
+
+  let head = '';
+  if (w !== null){
+    const dw = DOW[w];
+    head = `<div class="row"><div class="row-k">ดวงวันเกิด</div><div class="row-v">
+      <span class="swatch" style="background:${dw.hex}"></span>วัน${dw.name} ดาว${dw.planet} เลข ${dw.num}
+      · ${dw.color} · พระ${dw.buddha}</div></div>`;
+  }
+
+  if (!digits.length){
+    body.innerHTML = head + `<p class="note">ใส่ตัวเลขด้านบนเพื่อดูผลรวมทางเลขศาสตร์ ระบบจะบวกทุกหลักแล้วลดทอนให้เหลือหลักเดียว</p>`;
+    return;
+  }
+
+  const sum = digits.reduce((a,b)=>a+ +b, 0);
+  const one = reduce1(sum);
+  const dw  = w === null ? null : DOW[w];
+  const fit = dw && (one === dw.num || reduce1(one + dw.num) === dw.num);
+
+  body.innerHTML = head + `
+    <div class="row"><div class="row-k">ผลรวม</div><div class="row-v">
+      <div class="big">${sum}</div>
+      <div class="calcline">${digits.join(' + ')}</div>
+    </div></div>
+    <div class="row"><div class="row-k">เลขฐาน</div><div class="row-v">
+      <span class="chip"><b>${one}</b><small>${NUM_MEAN[one]}</small></span>
+    </div></div>
+    ${dw ? `<div class="row"><div class="row-k">เข้ากับดวง</div><div class="row-v ${fit?'yes':''}">
+      ${fit ? `หนุนกับดาว${dw.planet} เลข ${dw.num} ของวันเกิดคุณ`
+            : `เลข ${one} เป็นคนละสายกับดาว${dw.planet} เลข ${dw.num} ใช้ได้แต่ไม่ถือว่าหนุนกันเป็นพิเศษ`}
+    </div></div>` : ''}
+    <p class="note">เลขศาสตร์ใช้ผลรวมทุกหลักลดทอนเหลือหลักเดียว แล้วเทียบกับดาวเจ้าเรือน ๑ ถึง ๙ ตำราบางสำนักดูเลขคู่สองหลักและตำแหน่งเลขด้วย ผลที่ได้ที่นี่จึงเป็นภาพรวมอย่างเดียว</p>`;
+}
+
+document.getElementById('nIn').oninput = renderNum;
+nDow.onchange = () => {
+  try { localStorage.setItem('poom.dow', nDow.value); } catch(e){}
+  renderNum();
+};
+
+/* ============================================================
+   sheet + tabs
+   ============================================================ */
+const scrim = document.getElementById('scrim'), sheet = document.getElementById('sheet');
+
+function openDay(key){
+  const [y,m,dd] = key.split('-').map(Number);
+  const d = new Date(y, m, dd); d.setHours(12,0,0,0);
+  const dow = DOW[d.getDay()], { s, tags } = scoreOf(d), g = grade(s), a = actNames(d.getDay());
+
+  document.getElementById('sheetBody').innerHTML = `
+    <h2 class="serif" style="margin:0 0 2px;font-size:21px">วัน${dow.name}ที่ ${d.getDate()} ${MONTH[d.getMonth()]}</h2>
+    <p class="today-sub" style="margin:0 0 16px">พ.ศ. ${d.getFullYear()+543} · ดาว${dow.planet} · จุลศักราช ${csOf(d)}</p>
+    <div class="score">
+      <div class="score-top"><span>คะแนนมงคล</span><b style="color:${g.c}">${s} ${g.t}</b></div>
+      <div class="track"><div class="fill" style="width:${s}%;background:${g.c}"></div></div>
+    </div>
+    <div class="row"><div class="row-k">วารกาลโยค</div><div class="row-v">${
+      tags.length ? tags.map(t => `<div style="margin-bottom:6px"><b style="font-weight:500;color:${t.kind==='good'?'var(--gold)':'var(--shad)'}">${t.name}</b> ${t.text}</div>`).join('')
+                  : 'ไม่ตรงกับวารกาลโยคใด ถือเป็นวันกลาง ๆ'}</div></div>
+    <div class="row"><div class="row-k">เลขมงคล</div><div class="row-v"><div class="chips">${
+      numbersOf(d).map(x => `<span class="chip"><b>${x.n}</b><small>${x.why}</small></span>`).join('')}</div></div></div>
+    <div class="row"><div class="row-k">สีประจำวัน</div><div class="row-v"><span class="swatch" style="background:${dow.hex}"></span>${dow.color}</div></div>
+    <div class="row"><div class="row-k">เหมาะกับ</div><div class="row-v yes">${a.g.join(' · ') || 'ไม่มีที่เด่นเป็นพิเศษ'}</div></div>
+    <div class="row"><div class="row-k">ควรเลี่ยง</div><div class="row-v no">${a.b.join(' · ') || 'ไม่มีข้อห้าม'}</div></div>`;
+
+  scrim.classList.add('on');
+  requestAnimationFrame(() => sheet.classList.add('on'));
+}
+function closeDay(){ sheet.classList.remove('on'); scrim.classList.remove('on'); }
+scrim.onclick = closeDay;
+document.getElementById('sheetX').onclick = closeDay;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDay(); });
+
+document.getElementById('yBody').addEventListener('click', e => {
+  const c = e.target.closest('.cell:not(.pad)'); if (c) openDay(c.dataset.d);
+});
+document.getElementById('fBody').addEventListener('click', e => {
+  const h = e.target.closest('[data-d]'); if (h) openDay(h.dataset.d);
+});
+
+document.querySelector('nav').addEventListener('click', e => {
+  const b = e.target.closest('[data-go]'); if (!b) return;
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-current', String(x === b)));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById('p-' + b.dataset.go).classList.add('on');
+  window.scrollTo({ top:0, behavior:'instant' });
+});
+
+/* ============================================================
+   เสี่ยงโชค — เลขจากดาววันและตัวเลขของวันงวด
+   งวดสลากไทยออกวันที่ 1 และ 16 ของทุกเดือน (บางงวดเลื่อน)
+   ============================================================ */
+const pad2 = n => String(n % 100).padStart(2,'0');
+const pad3 = n => String(n % 1000).padStart(3,'0');
+
+function nextDraws(from, count){
+  const out = [];
+  let y = from.getFullYear(), m = from.getMonth();
+  while (out.length < count){
+    for (const dd of [1,16]){
+      const d = new Date(y, m, dd); d.setHours(12,0,0,0);
+      if (d >= new Date(from.getFullYear(), from.getMonth(), from.getDate()) && out.length < count) out.push(d);
+    }
+    m++; if (m > 11){ m = 0; y++; }
+  }
+  return out;
+}
+
+function luckOf(d){
+  const dow = DOW[d.getDay()], cs = csOf(d), be = d.getFullYear() + 543;
+  const a = dow.num;                        // ดาวประจำวันงวด
+  const b = reduce1(d.getDate());           // เลขวันที่ ลดทอน
+  const c = reduce1(d.getMonth() + 1);      // เลขเดือน ลดทอน
+  const e = reduce1(digitSum(be));          // เลขปี ลดทอน
+  return {
+    dow, cs,
+    two: [
+      { n: `${a}${b}`,               why: `ดาว${dow.planet} ${a} คู่กับเลขวันที่ ${b}` },
+      { n: `${b}${a}`,               why: 'กลับตัวของชุดแรก' },
+      { n: pad2(d.getDate() + cs),   why: `วันที่ ${d.getDate()} บวกจุลศักราช ${cs}` }
+    ],
+    three: [
+      { n: `${a}${b}${c}`,           why: `ดาววัน เลขวันที่ เลขเดือน (${a}-${b}-${c})` },
+      { n: pad3(cs * a),             why: `จุลศักราช ${cs} คูณเลขดาว ${a}` },
+      { n: pad3(digitSum(d.getDate()) * 100 + digitSum(be) * a), why: 'ผลรวมวันที่กับปี พ.ศ.' }
+    ],
+    run: [...new Set([a, b, reduce1(a + b), e])]
+  };
+}
+
+function renderLuck(){
+  const draws = nextDraws(today, 4);
+  const main = draws[0];
+  const L = luckOf(main);
+  const st = statusOf(main);
+  const tag = st.tags.length ? st.tags.map(t => t.name).join(' + ') : 'วันปกติ';
+  const tone = st.tags.some(t => t.kind === 'bad') && !st.tags.some(t => t.kind === 'good');
+
+  document.getElementById('lBody').innerHTML = `
+    <div class="seal-row">
+      <div class="seal ${tone ? 'bad' : st.tags.length ? '' : 'mid'}">
+        <div><div class="seal-num">${thNum(main.getDate())}</div><div class="seal-tag">งวดหน้า</div></div>
+      </div>
+      <div>
+        <h2 class="today-name">วัน${L.dow.name}</h2>
+        <p class="today-sub">งวด ${fmtDate(main)}</p>
+        <p class="today-planet"><span class="dot" style="background:${L.dow.hex}"></span>ดาว${L.dow.planet} เลข ${L.dow.num} · ${tag}</p>
+      </div>
+    </div>
+
+    <div class="row"><div class="row-k">สองตัว</div><div class="row-v"><div class="chips">${
+      L.two.map(x => `<span class="chip"><b>${x.n}</b><small>${x.why}</small></span>`).join('')}</div></div></div>
+    <div class="row"><div class="row-k">สามตัว</div><div class="row-v"><div class="chips">${
+      L.three.map(x => `<span class="chip"><b>${x.n}</b><small>${x.why}</small></span>`).join('')}</div></div></div>
+    <div class="row"><div class="row-k">เลขวิ่ง</div><div class="row-v"><div class="chips">${
+      L.run.map(n => `<span class="chip"><b>${n}</b></span>`).join('')}</div></div></div>
+    <div class="row"><div class="row-k">งวดถัดไป</div><div class="row-v">${
+      draws.slice(1).map(d => {
+        const l = luckOf(d);
+        return `<div style="margin-bottom:6px">${fmtDate(d)} วัน${l.dow.name} — สองตัว ${l.two[0].n} / ${l.two[1].n} · สามตัว ${l.three[0].n}</div>`;
+      }).join('')}</div></div>
+
+    <p class="note">เลขชุดนี้คำนวณตรง ๆ จากดาวประจำวันงวด เลขวันที่ เดือน ปี และจุลศักราช เปิดวันเดิมกี่ครั้งก็ได้เลขเดิม ไม่มีการสุ่ม จึงตรวจย้อนที่มาได้ทุกตัว</p>
+    <p class="note" style="border-top-color:rgba(184,66,47,.4)">แต่ต้องพูดให้ชัด การออกรางวัลเป็นการสุ่มล้วน ๆ ไม่มีสูตรหรือดาวไหนทำให้ถูกรางวัลง่ายขึ้นจริง เลขเหล่านี้เป็นความเชื่อและความสนุกแบบเดียวกับเลขในปฏิทินจีน ซื้อเท่าที่เสียแล้วไม่กระทบค่าใช้จ่ายจำเป็น และวันที่ออกงวดบางงวดมีเลื่อน เช่น งวดต้นปี ควรเช็กกับสำนักงานสลากกินแบ่งรัฐบาลก่อน</p>`;
+}
+
+/* boot */
+renderLuck();
+renderToday();
+renderYear();
+renderFindCtl();
+renderFind();
+renderNum();
+</script>
+</body>
+</html>
