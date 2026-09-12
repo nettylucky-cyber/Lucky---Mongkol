@@ -129,20 +129,21 @@
   .yearbar b{font-family:"LM Serif",serif;font-size:20px;font-weight:600;flex:1;text-align:center}
   .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-bottom:20px}
   .mon{margin-bottom:26px}
-  .mon h3{margin:0 0 10px;font-size:16px;display:flex;align-items:baseline;gap:8px}
+  .mon h3{margin:0 0 12px;font-size:16px;display:flex;align-items:baseline;gap:8px}
   .mon h3 small{font-weight:400;font-family:"LM Sans",sans-serif;color:var(--muted);font-size:11.5px}
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-  .hd{font-size:11px;color:var(--muted);text-align:center;padding-bottom:3px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .hd{font-size:11.5px;color:var(--muted);text-align:center;padding-bottom:5px;line-height:1.35}
+  .hd b{display:block;font-size:9px;font-weight:500;letter-spacing:-.02em;white-space:nowrap}
   .cell{
-    aspect-ratio:1/1;border:0;background:var(--ink-2);color:var(--paper);
-    border-radius:7px;font:inherit;font-size:13px;cursor:pointer;
+    aspect-ratio:1/1;border:0;background:rgba(244,231,203,.055);color:rgba(244,231,203,.88);
+    border-radius:8px;font:inherit;font-size:13.5px;cursor:pointer;
     display:grid;place-items:center;position:relative;padding:0
   }
   .cell.pad{background:none;cursor:default}
-  .cell.g1{background:rgba(232,184,75,.26);color:#FBEDC6}
-  .cell.g2{background:rgba(134,174,99,.22);color:#E6F2D5}
-  .cell.b1{background:rgba(194,80,44,.28);color:#F8D8C8}
-  .cell.mix{background:linear-gradient(135deg,rgba(232,184,75,.28) 50%,rgba(194,80,44,.30) 50%)}
+  .cell.g1{background:rgba(232,184,75,.15);color:#F5CE72;font-weight:500}
+  .cell.g2{background:rgba(134,174,99,.15);color:#A9CE7C;font-weight:500}
+  .cell.b1{background:rgba(226,115,90,.14);color:#EE8B72}
+  .cell.mix{background:linear-gradient(135deg,rgba(232,184,75,.17) 50%,rgba(226,115,90,.16) 50%);color:#F2D08A}
   .cell.now{box-shadow:0 0 0 1.5px var(--paper)}
   .cell{padding-bottom:11px}
   .cell svg{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:12px;height:12px;display:block}
@@ -573,8 +574,23 @@ function renderYear(){
       const L = lunarOf(d), f = festOf(d);
       cells += `<button class="cell ${toneOf(d)}${isNow?' now':''}${f?' fest':''}" data-d="${year}-${m}-${dd}">${dd}${dayIcon(d, L)}</button>`;
     }
-    out.push(`<div class="mon"><h3>${MONTH[m]} <small>ธงชัย ${DOW[k.thongchai].name} · อธิบดี ${DOW[k.athibodi].name}</small></h3>
-      <div class="grid">${['อา','จ','อ','พ','พฤ','ศ','ส'].map(x=>`<div class="hd">${x}</div>`).join('')}${cells}</div></div>`);
+    const kA = kalayokOf(csOf(new Date(year, m, 1))),
+          kB = kalayokOf(csOf(new Date(year, m, days))),
+          split = kA.cs !== kB.cs;
+    const tagOf = w => {
+      if (split) return '';
+      const t = [];
+      if (w === k.thongchai) t.push(['ธงชัย','var(--gold)']);
+      if (w === k.athibodi)  t.push(['อธิบดี','var(--jade)']);
+      if (w === k.ubat)      t.push(['อุบาทว์','#EE8B72']);
+      if (w === k.lokawinat) t.push(['โลกาฯ','#EE8B72']);
+      return t.map(x => `<b style="color:${x[1]}">${x[0]}</b>`).join('');
+    };
+    const head = ['อา','จ','อ','พ','พฤ','ศ','ส']
+      .map((x,w) => `<div class="hd">${x}${tagOf(w)}</div>`).join('');
+    out.push(`<div class="mon"><h3>${MONTH[m]}${split
+      ? ' <small>กาลโยคเปลี่ยนวันเถลิงศก 16 เมษายน</small>' : ''}</h3>
+      <div class="grid">${head}${cells}</div></div>`);
   }
   document.getElementById('yBody').innerHTML = out.join('');
 }
